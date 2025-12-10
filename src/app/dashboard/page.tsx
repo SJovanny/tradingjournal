@@ -3,10 +3,6 @@
 // ============================================================================
 
 import { Suspense } from "react";
-import { LayoutDashboard, Plus, RefreshCw } from "lucide-react";
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import {
@@ -25,6 +21,7 @@ import {
     WinRateGauge,
 } from "@/components/dashboard/Charts";
 import { RecentTradesTable } from "@/components/dashboard/RecentTrades";
+import { Calendar } from "@/components/dashboard/Calendar";
 
 export default async function DashboardPage() {
     // Fetch all data in parallel
@@ -43,76 +40,74 @@ export default async function DashboardPage() {
     const symbols = symbolResult.success ? symbolResult.data : [];
     const trades = tradesResult.success ? tradesResult.data : [];
 
-    return (
-        <div className="min-h-screen bg-background">
-            {/* Header */}
-            <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-primary/10">
-                                <LayoutDashboard className="h-6 w-6 text-primary" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-bold">Dashboard</h1>
-                                <p className="text-sm text-muted-foreground">
-                                    Vue d&apos;ensemble de vos performances
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm">
-                                <RefreshCw className="h-4 w-4 mr-2" />
-                                Actualiser
-                            </Button>
-                            <Button asChild>
-                                <Link href="/trades/new">
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Nouveau Trade
-                                </Link>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </header>
+    // Transform trades for calendar (map to expected format)
+    const calendarTrades = trades.map((trade) => ({
+        id: trade.id,
+        symbol: trade.symbol,
+        direction: trade.direction as "LONG" | "SHORT",
+        net_pnl: trade.netPnL || 0,
+        entry_date: trade.entryDate || "",
+        exit_date: trade.exitDate || null,
+        status: trade.status,
+    }));
 
-            {/* Main Content */}
-            <main className="container mx-auto px-4 py-6 space-y-6">
-                {/* KPI Cards */}
-                <Suspense fallback={<StatsCardsSkeleton />}>
-                    {stats && <StatsCards stats={stats} />}
+    return (
+        <div className="space-y-6">
+            {/* KPI Cards */}
+            <Suspense fallback={<StatsCardsSkeleton />}>
+                {stats && <StatsCards stats={stats} />}
+            </Suspense>
+
+            {/* Calendar and Equity Curve */}
+            <div className="grid gap-6 lg:grid-cols-2">
+                {/* Calendar Heatmap */}
+                <Suspense fallback={<ChartSkeleton />}>
+                    <Calendar trades={calendarTrades} />
                 </Suspense>
 
                 {/* Equity Curve */}
                 <Suspense fallback={<ChartSkeleton />}>
-                    {equity.length > 0 && <EquityCurveChart data={equity} />}
+                    {equity.length > 0 ? (
+                        <EquityCurveChart data={equity} />
+                    ) : (
+                        <div className="flex items-center justify-center h-[300px] bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                            <p className="text-slate-500">Aucun trade pour afficher la courbe</p>
+                        </div>
+                    )}
+                </Suspense>
+            </div>
+
+            {/* Charts Grid */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Suspense fallback={<ChartSkeleton />}>
+                    {stats && <WinRateGauge winRate={stats.winRate} trades={stats.totalTrades} />}
                 </Suspense>
 
-                {/* Charts Grid */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <Suspense fallback={<ChartSkeleton />}>
-                        {stats && <WinRateGauge winRate={stats.winRate} trades={stats.totalTrades} />}
-                    </Suspense>
-
-                    <Suspense fallback={<ChartSkeleton />}>
-                        {strategies.length > 0 && <StrategyPerformanceChart data={strategies} />}
-                    </Suspense>
-
-                    <Suspense fallback={<ChartSkeleton />}>
-                        {symbols.length > 0 && <SymbolPerformanceChart data={symbols} />}
-                    </Suspense>
-                </div>
-
-                {/* Detailed Stats */}
-                <Suspense fallback={<DetailedStatsSkeleton />}>
-                    {stats && <DetailedStats stats={stats} />}
+                <Suspense fallback={<ChartSkeleton />}>
+                    {strategies.length > 0 && <StrategyPerformanceChart data={strategies} />}
                 </Suspense>
 
-                {/* Recent Trades */}
-                <Suspense fallback={<TableSkeleton />}>
-                    {trades.length > 0 && <RecentTradesTable trades={trades} />}
+                <Suspense fallback={<ChartSkeleton />}>
+                    {symbols.length > 0 && <SymbolPerformanceChart data={symbols} />}
                 </Suspense>
-            </main>
+            </div>
+
+            {/* Detailed Stats */}
+            <Suspense fallback={<DetailedStatsSkeleton />}>
+                {stats && <DetailedStats stats={stats} />}
+            </Suspense>
+
+            {/* Recent Trades */}
+            <Suspense fallback={<TableSkeleton />}>
+                {trades.length > 0 ? (
+                    <RecentTradesTable trades={trades} />
+                ) : (
+                    <div className="flex flex-col items-center justify-center h-[200px] bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <p className="text-slate-500 mb-2">Aucun trade enregistré</p>
+                        <p className="text-sm text-slate-400">Commencez par ajouter votre premier trade</p>
+                    </div>
+                )}
+            </Suspense>
         </div>
     );
 }
@@ -132,7 +127,7 @@ function StatsCardsSkeleton() {
 }
 
 function ChartSkeleton() {
-    return <Skeleton className="h-[300px] w-full" />;
+    return <Skeleton className="h-[300px] w-full rounded-xl" />;
 }
 
 function DetailedStatsSkeleton() {
@@ -146,5 +141,5 @@ function DetailedStatsSkeleton() {
 }
 
 function TableSkeleton() {
-    return <Skeleton className="h-80 w-full" />;
+    return <Skeleton className="h-80 w-full rounded-xl" />;
 }

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="kore-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0062ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#61efff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(75, 50) scale(0.8)">
+    <rect x="0" y="0" width="40" height="160" rx="10" fill="url(#kore-gradient)" />
+
+    <path d="M 60 80 L 140 0 L 180 0 L 180 40 L 100 120 L 180 200 L 140 200 L 60 120 Z" fill="url(#kore-gradient)"/>
+  </g>
+
+  <text x="150" y="260" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" font-size="48" letter-spacing="6" fill="#1a202c" text-anchor="middle">KORE</text>
+</svg>
