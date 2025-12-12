@@ -8,19 +8,21 @@ import { useState, useCallback } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
-    Upload,
     X,
     ImageIcon,
     TrendingUp,
     MessageSquare,
     ChartCandlestick,
     Loader2,
+    Brain,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
     Dialog,
     DialogContent,
@@ -28,15 +30,28 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
+import {
+    TradePropertiesForm,
+    type TradeProperties,
+    DEFAULT_TRADE_PROPERTIES,
+} from "./TradePropertiesForm";
+import { EMOTION_TAGS } from "@/lib/validations/tradeSchema";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
+interface Portfolio {
+    id: string;
+    name: string;
+    portfolio_type: string;
+}
+
 interface AddTradeModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     selectedDate: Date;
+    portfolios?: Portfolio[];
     onSubmit?: (data: TradeDocumentation) => void;
 }
 
@@ -50,6 +65,7 @@ interface ScreenshotField {
 
 interface TradeDocumentation {
     date: Date;
+    properties: TradeProperties;
     screenshots: {
         h4?: File;
         m15?: File;
@@ -185,11 +201,16 @@ export function AddTradeModal({
     open,
     onOpenChange,
     selectedDate,
+    portfolios = [],
     onSubmit,
 }: AddTradeModalProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [entryReason, setEntryReason] = useState("");
     const [postAnalysis, setPostAnalysis] = useState("");
+    const [tradeProperties, setTradeProperties] = useState<TradeProperties>({
+        ...DEFAULT_TRADE_PROPERTIES,
+        portfolioId: portfolios[0]?.id || "",
+    });
 
     // Screenshot states
     const [screenshots, setScreenshots] = useState<{
@@ -231,11 +252,22 @@ export function AddTradeModal({
         []
     );
 
+    const toggleEmotion = (emotion: string) => {
+        setTradeProperties((prev) => {
+            const currentEmotions = prev.emotions || [];
+            const newEmotions = currentEmotions.includes(emotion)
+                ? currentEmotions.filter((e) => e !== emotion)
+                : [...currentEmotions, emotion];
+            return { ...prev, emotions: newEmotions };
+        });
+    };
+
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
             const data: TradeDocumentation = {
                 date: selectedDate,
+                properties: tradeProperties,
                 screenshots: {
                     h4: screenshots.h4.file || undefined,
                     m15: screenshots.m15.file || undefined,
@@ -270,12 +302,13 @@ export function AddTradeModal({
         });
         setEntryReason("");
         setPostAnalysis("");
+        setTradeProperties({ ...DEFAULT_TRADE_PROPERTIES, portfolioId: portfolios[0]?.id || "" });
         onOpenChange(false);
     };
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <ChartCandlestick className="w-5 h-5 text-blue-600" />
@@ -287,6 +320,15 @@ export function AddTradeModal({
                 </DialogHeader>
 
                 <div className="flex-1 overflow-y-auto space-y-6 py-4 pr-2">
+                    {/* Trade Properties Form */}
+                    <TradePropertiesForm
+                        value={tradeProperties}
+                        onChange={setTradeProperties}
+                        portfolios={portfolios}
+                    />
+
+                    <Separator />
+
                     {/* Vue d'ensemble - Screenshots */}
                     <div className="space-y-3">
                         <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -380,6 +422,35 @@ export function AddTradeModal({
                                     className="min-h-[100px] resize-none"
                                 />
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Emotions */}
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                            <Brain className="w-4 h-4 text-purple-500" />
+                            Psychologie & Émotions
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {EMOTION_TAGS.map((e) => (
+                                <Badge
+                                    key={e.value}
+                                    variant={
+                                        tradeProperties.emotions?.includes(e.value)
+                                            ? "default"
+                                            : "outline"
+                                    }
+                                    className={cn(
+                                        "cursor-pointer transition-all hover:opacity-80",
+                                        tradeProperties.emotions?.includes(e.value)
+                                            ? e.color
+                                            : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    )}
+                                    onClick={() => toggleEmotion(e.value)}
+                                >
+                                    {e.label}
+                                </Badge>
+                            ))}
                         </div>
                     </div>
                 </div>

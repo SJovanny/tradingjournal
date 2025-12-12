@@ -150,3 +150,59 @@ export const CHART_TIMEFRAMES = [
   { value: "W1", label: "Hebdomadaire" },
   { value: "MN", label: "Mensuel" },
 ] as const;
+
+// Constantes pour les sessions de trading
+export const TRADING_SESSIONS = [
+  { value: "ASIAN", label: "🌏 Asie (Tokyo)", color: "bg-pink-500" },
+  { value: "LONDON", label: "🇬🇧 Londres", color: "bg-blue-500" },
+  { value: "NEW_YORK", label: "🇺🇸 New York", color: "bg-green-500" },
+  { value: "SYDNEY", label: "🇦🇺 Sydney", color: "bg-purple-500" },
+  { value: "OVERLAP_LONDON_NY", label: "🔄 London/NY Overlap", color: "bg-orange-500" },
+] as const;
+
+// Constantes pour les résultats de trade
+export const TRADE_RESULTS = [
+  { value: "PROFIT", label: "✅ Profit", color: "bg-green-500" },
+  { value: "LOSS", label: "❌ Loss", color: "bg-red-500" },
+  { value: "BREAKEVEN", label: "➖ Breakeven", color: "bg-gray-500" },
+] as const;
+
+// Constantes pour les biais psychologiques
+export const PSYCHOLOGICAL_BIASES = [
+  { value: "FOMO", label: "😫 FOMO", color: "bg-orange-500" },
+  { value: "REVENGE_TRADING", label: "😤 Revenge Trading", color: "bg-red-600" },
+  { value: "OVERCONFIDENCE", label: "🦸 Sur-confiance", color: "bg-purple-500" },
+  { value: "LOSS_AVERSION", label: "😰 Aversion à la perte", color: "bg-yellow-500" },
+  { value: "CONFIRMATION_BIAS", label: "🔍 Biais de confirmation", color: "bg-blue-500" },
+  { value: "ANCHORING", label: "⚓ Ancrage", color: "bg-cyan-500" },
+  { value: "RECENCY_BIAS", label: "📅 Biais de récence", color: "bg-pink-500" },
+  { value: "NONE", label: "✨ Aucun biais", color: "bg-green-500" },
+] as const;
+
+// Constantes pour les types d'actifs
+export const ASSET_TYPES = [
+  { value: "FOREX", label: "💱 Forex" },
+  { value: "CRYPTO", label: "₿ Crypto" },
+  { value: "STOCK", label: "📈 Actions" },
+  { value: "ETF", label: "📊 ETF" },
+  { value: "COMMODITY", label: "🥇 Commodités" },
+  { value: "INDEX", label: "📉 Indices" },
+  { value: "OTHER", label: "📋 Autre" },
+] as const;
+
+// Constantes pour les confluences
+export const CONFLUENCES = [
+  { value: "SUPPORT", label: "Support" },
+  { value: "RESISTANCE", label: "Résistance" },
+  { value: "TRENDLINE", label: "Trendline" },
+  { value: "FIBONACCI", label: "Fibonacci" },
+  { value: "MOVING_AVERAGE", label: "Moyenne Mobile" },
+  { value: "VOLUME", label: "Volume" },
+  { value: "DIVERGENCE", label: "Divergence" },
+  { value: "PATTERN", label: "Pattern" },
+  { value: "NEWS", label: "News/Fondamental" },
+  { value: "ORDER_BLOCK", label: "Order Block" },
+  { value: "FVG", label: "Fair Value Gap" },
+  { value: "LIQUIDITY", label: "Liquidité" },
+] as const;
+

@@ -12,6 +12,12 @@ import {
     getSymbolPerformance,
     getRecentTrades,
 } from "@/app/actions/dashboard";
+import {
+    DUMMY_STATS,
+    DUMMY_EQUITY_CURVE,
+    DUMMY_STRATEGIES,
+    DUMMY_SYMBOLS,
+} from "@/lib/dummy-data";
 
 import { StatsCards, DetailedStats } from "@/components/dashboard/StatsCards";
 import {
@@ -40,6 +46,14 @@ export default async function DashboardPage() {
     const symbols = symbolResult.success ? symbolResult.data : [];
     const trades = tradesResult.success ? tradesResult.data : [];
 
+    // Use dummy data if no trades exist to show "demo mode"
+    const showDemoData = stats?.totalTrades === 0;
+
+    const displayStats = showDemoData ? DUMMY_STATS : stats;
+    const displayEquity = showDemoData ? DUMMY_EQUITY_CURVE : equity;
+    const displayStrategies = showDemoData ? DUMMY_STRATEGIES : strategies;
+    const displaySymbols = showDemoData ? DUMMY_SYMBOLS : symbols;
+
     // Transform trades for calendar (map to expected format)
     const calendarTrades = trades.map((trade) => ({
         id: trade.id,
@@ -55,7 +69,7 @@ export default async function DashboardPage() {
         <div className="space-y-6">
             {/* KPI Cards */}
             <Suspense fallback={<StatsCardsSkeleton />}>
-                {stats && <StatsCards stats={stats} />}
+                {displayStats && <StatsCards stats={displayStats} />}
             </Suspense>
 
             {/* Calendar and Equity Curve */}
@@ -67,8 +81,8 @@ export default async function DashboardPage() {
 
                 {/* Equity Curve */}
                 <Suspense fallback={<ChartSkeleton />}>
-                    {equity.length > 0 ? (
-                        <EquityCurveChart data={equity} />
+                    {displayEquity.length > 0 ? (
+                        <EquityCurveChart data={displayEquity} />
                     ) : (
                         <div className="flex items-center justify-center h-[300px] bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
                             <p className="text-slate-500">Aucun trade pour afficher la courbe</p>
@@ -80,21 +94,21 @@ export default async function DashboardPage() {
             {/* Charts Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Suspense fallback={<ChartSkeleton />}>
-                    {stats && <WinRateGauge winRate={stats.winRate} trades={stats.totalTrades} />}
+                    {displayStats && <WinRateGauge winRate={displayStats.winRate} trades={displayStats.totalTrades} />}
                 </Suspense>
 
                 <Suspense fallback={<ChartSkeleton />}>
-                    {strategies.length > 0 && <StrategyPerformanceChart data={strategies} />}
+                    {displayStrategies.length > 0 && <StrategyPerformanceChart data={displayStrategies} />}
                 </Suspense>
 
                 <Suspense fallback={<ChartSkeleton />}>
-                    {symbols.length > 0 && <SymbolPerformanceChart data={symbols} />}
+                    {displaySymbols.length > 0 && <SymbolPerformanceChart data={displaySymbols} />}
                 </Suspense>
             </div>
 
             {/* Detailed Stats */}
             <Suspense fallback={<DetailedStatsSkeleton />}>
-                {stats && <DetailedStats stats={stats} />}
+                {displayStats && <DetailedStats stats={displayStats} />}
             </Suspense>
 
             {/* Recent Trades */}
