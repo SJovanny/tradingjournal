@@ -27,8 +27,6 @@ export function HeatmapCard({ height = 400 }: HeatmapCardProps) {
             </CardHeader>
             <CardContent className="p-0">
                 <TradingViewHeatmap
-                    dataSource="ForexCross"
-                    colorTheme="dark"
                     height={height}
                 />
             </CardContent>

@@ -12,6 +12,7 @@ import {
     getSymbolPerformance,
     getRecentTrades,
 } from "@/app/actions/dashboard";
+import { getGoals, getNotes } from "@/app/actions/goals-notes";
 import {
     DUMMY_STATS,
     DUMMY_EQUITY_CURVE,
@@ -34,20 +35,31 @@ import { HeatmapCard } from "@/components/widgets/HeatmapCard";
 
 export default async function DashboardPage() {
     // Fetch all data in parallel
-    const [statsResult, equityResult, strategyResult, symbolResult, tradesResult] =
-        await Promise.all([
-            getTradingStats(),
-            getEquityCurve(),
-            getStrategyPerformance(),
-            getSymbolPerformance(),
-            getRecentTrades(10),
-        ]);
+    const [
+        statsResult,
+        equityResult,
+        strategyResult,
+        symbolResult,
+        tradesResult,
+        goalsResult,
+        notesResult
+    ] = await Promise.all([
+        getTradingStats(),
+        getEquityCurve(),
+        getStrategyPerformance(),
+        getSymbolPerformance(),
+        getRecentTrades(10),
+        getGoals(),
+        getNotes(),
+    ]);
 
     const stats = statsResult.success ? statsResult.data : null;
     const equity = equityResult.success ? equityResult.data : [];
     const strategies = strategyResult.success ? strategyResult.data : [];
     const symbols = symbolResult.success ? symbolResult.data : [];
     const trades = tradesResult.success ? tradesResult.data : [];
+    const goals = goalsResult.success ? goalsResult.data : [];
+    const notes = notesResult.success ? notesResult.data : [];
 
     // Use dummy data if no trades exist to show "demo mode"
     const showDemoData = stats?.totalTrades === 0;
@@ -87,7 +99,7 @@ export default async function DashboardPage() {
                 {/* Goals & Notes Panel - 1/3 width */}
                 <div className="lg:col-span-1">
                     <Suspense fallback={<Skeleton className="h-[320px] w-full rounded-xl" />}>
-                        <GoalsNotesPanel />
+                        <GoalsNotesPanel goals={goals} notes={notes} />
                     </Suspense>
                 </div>
             </div>

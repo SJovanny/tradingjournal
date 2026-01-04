@@ -49,7 +49,8 @@ export async function registerWithEmail(formData: FormData): Promise<AuthActionR
 
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const fullName = formData.get("fullName") as string;
+    const firstName = formData.get("firstName") as string;
+    const lastName = formData.get("lastName") as string;
 
     if (!email || !password) {
         return { error: "Email et mot de passe requis" };
@@ -64,7 +65,9 @@ export async function registerWithEmail(formData: FormData): Promise<AuthActionR
         password,
         options: {
             data: {
-                full_name: fullName,
+                first_name: firstName || "",
+                last_name: lastName || "",
+                full_name: `${firstName || ""} ${lastName || ""}`.trim(),
             },
         },
     });
@@ -136,4 +139,29 @@ export async function getUserProfile() {
         .single();
 
     return profile;
+}
+
+// ============================================================================
+// DELETE ACCOUNT - Supprimer le compte utilisateur
+// ============================================================================
+export async function deleteAccount(): Promise<AuthActionResult> {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { error: "Non authentifié" };
+    }
+
+    // Call the database function to delete the account
+    const { error } = await supabase.rpc("delete_own_account");
+
+    if (error) {
+        console.error("Error deleting account:", error);
+        return { error: "Erreur lors de la suppression du compte" };
+    }
+
+    // Sign out and redirect
+    await supabase.auth.signOut();
+    revalidatePath("/", "layout");
+    redirect("/login");
 }

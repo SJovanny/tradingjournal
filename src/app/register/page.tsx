@@ -130,18 +130,34 @@ export default function RegisterPage() {
                             </div>
                         )}
 
-                        <div className="space-y-2">
-                            <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-300">
-                                Nom complet
-                            </Label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                                <Label htmlFor="firstName" className="text-slate-700 dark:text-slate-300">
+                                    Prénom
+                                </Label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <Input
+                                        id="firstName"
+                                        name="firstName"
+                                        type="text"
+                                        placeholder="John"
+                                        className="pl-10 h-12 border-2 focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="lastName" className="text-slate-700 dark:text-slate-300">
+                                    Nom
+                                </Label>
                                 <Input
-                                    id="fullName"
-                                    name="fullName"
+                                    id="lastName"
+                                    name="lastName"
                                     type="text"
-                                    placeholder="John Doe"
-                                    className="pl-10 h-12 border-2 focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors"
+                                    placeholder="Doe"
+                                    className="h-12 border-2 focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors"
+                                    required
                                 />
                             </div>
                         </div>

@@ -47,7 +47,7 @@ export function EquityCurveChart({ data }: EquityCurveChartProps) {
             </CardHeader>
             <CardContent>
                 <div className="h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
@@ -139,7 +139,7 @@ export function StrategyPerformanceChart({ data }: StrategyChartProps) {
             </CardHeader>
             <CardContent>
                 <div className="h-[250px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <BarChart data={data} layout="vertical" margin={{ left: 20, right: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
                             <XAxis
@@ -220,7 +220,7 @@ export function SymbolPerformanceChart({ data }: SymbolChartProps) {
             </CardHeader>
             <CardContent>
                 <div className="h-[250px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <PieChart>
                             <Pie
                                 data={pieData}
